@@ -17,6 +17,7 @@
         display: flex;
         align-items: center;
         gap: 20px;
+        flex-wrap: wrap;
     }
     
     select#songSelect {
@@ -27,11 +28,11 @@
         cursor: pointer;
     }
 
-    /* 再生コントロールのボタンスタイル */
     .player-controls {
         display: flex;
         gap: 10px;
     }
+
     .player-controls button {
         font-size: 16px;
         padding: 8px 20px;
@@ -42,28 +43,59 @@
         color: white;
         box-shadow: 0 2px 4px rgba(0,0,0,0.2);
         transition: background-color 0.2s;
+        min-width: 100px;
     }
-    .player-controls button:hover { background-color: #0056b3; }
+
+    .player-controls button:hover:not(:disabled) { background-color: #0056b3; }
     .player-controls button:disabled {
         background-color: #ccc;
         cursor: not-allowed;
         box-shadow: none;
     }
+    
     #btn-reset { background-color: #6c757d; }
     #btn-reset:hover { background-color: #5a6268; }
+
+    /* 追加：スライダーのスタイル */
+    .slider-controls {
+        display: flex;
+        gap: 20px;
+        background: #fff;
+        padding: 10px 20px;
+        border-radius: 8px;
+        border: 1px solid #ddd;
+    }
+    .slider-controls label {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin: 0;
+        font-size: 15px;
+        font-weight: bold;
+    }
+    .slider-controls input[type="range"] {
+        cursor: pointer;
+    }
+    .slider-value {
+        display: inline-block;
+        width: 40px;
+        text-align: right;
+        font-weight: normal;
+    }
 
     .tracks-container {
         display: flex;
         flex-wrap: wrap;
-        gap: 20px;
+        gap: 10px;
+        margin-top: 20px;
     }
 
     .track {
         background: #fff;
         border: 1px solid #ddd;
         border-radius: 8px;
-        padding: 15px 25px;
-        min-width: 150px;
+        padding: 15px 15px;
+        min-width: 160px;
         box-shadow: 0 2px 5px rgba(0,0,0,0.05);
     }
 
@@ -73,20 +105,20 @@
         margin-bottom: 15px;
         padding-bottom: 10px;
         border-bottom: 2px solid #eee;
-        font-size: 18px;
-    }
-
-    label {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        margin-bottom: 15px;
-        cursor: pointer;
         font-size: 16px;
     }
+
+    .track label {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        margin-bottom: 15px;
+        cursor: pointer;
+        font-size: 15px;
+    }
     
-    label:last-child {
-        margin-top: 25px;
+    .track label:last-child {
+        margin-top: 20px;
         margin-bottom: 0;
     }
 
@@ -113,11 +145,21 @@
         <option value="kankyo">かんきょう</option>
     </select>
 
-    <!-- 全体の再生コントロール追加 -->
     <div class="player-controls">
-        <button id="btn-play">再生</button>
-        <button id="btn-pause" disabled>一時停止</button>
+        <button id="btn-toggle">再生</button>
         <button id="btn-reset">最初から再生</button>
+    </div>
+
+    <!-- 追加：音量と速度のスライダー -->
+    <div class="slider-controls">
+        <label>音量: 
+            <input type="range" id="volume-slider" min="0" max="2" step="0.05" value="1">
+            <span class="slider-value" id="volume-value">1.00</span>
+        </label>
+        <label>速度: 
+            <input type="range" id="speed-slider" min="0.25" max="2" step="0.05" value="1">
+            <span class="slider-value" id="speed-value">1.00</span>
+        </label>
     </div>
 </div>
 
@@ -132,18 +174,18 @@
 
     <div class="track">
         <div class="track-title">メイン伴奏</div>
-        <label><input type="radio" name="main" value="0" checked><span id="label-main-0">楽器1</span></label>
-        <label><input type="radio" name="main" value="1"><span id="label-main-1">楽器2</span></label>
-        <label><input type="radio" name="main" value="2"><span id="label-main-2">楽器3</span></label>
-        <label><input type="radio" name="main" value="mute"><span>無音</span></label>
+        <label><input type="radio" name="harmony1" value="0" checked><span id="label-harmony1-0">楽器1</span></label>
+        <label><input type="radio" name="harmony1" value="1"><span id="label-harmony1-1">楽器2</span></label>
+        <label><input type="radio" name="harmony1" value="2"><span id="label-harmony1-2">楽器3</span></label>
+        <label><input type="radio" name="harmony1" value="mute"><span>無音</span></label>
     </div>
 
     <div class="track">
         <div class="track-title">サブ伴奏</div>
-        <label><input type="radio" name="sub" value="0" checked><span id="label-sub-0">楽器1</span></label>
-        <label><input type="radio" name="sub" value="1"><span id="label-sub-1">楽器2</span></label>
-        <label><input type="radio" name="sub" value="2"><span id="label-sub-2">楽器3</span></label>
-        <label><input type="radio" name="sub" value="mute"><span>無音</span></label>
+        <label><input type="radio" name="harmony2" value="0" checked><span id="label-harmony2-0">楽器1</span></label>
+        <label><input type="radio" name="harmony2" value="1"><span id="label-harmony2-1">楽器2</span></label>
+        <label><input type="radio" name="harmony2" value="2"><span id="label-harmony2-2">楽器3</span></label>
+        <label><input type="radio" name="harmony2" value="mute"><span>無音</span></label>
     </div>
 
     <div class="track">
@@ -156,64 +198,79 @@
 </div>
 
 <script>
-/**
- * ＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝
- * 👇 ここから下のデータを書き換えてカスタマイズしてください 👇
- * ＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝
- * 
- * loopStartSample: ループ開始位置（サンプル数）
- * loopEndSample: ループ終了位置（サンプル数）
- */
 const MUSIC_DATA = {
     "sanpo": {
         loopStartSample: 48136, 
         loopEndSample: 2352135,  
         melody: [
-            { name: "バイオリン", src: "audio/sanpo/Tpb_BGMNode_01_melody_1.wav" },
-            { name: "リコーダー", src: "audio/sanpo/Tpb_BGMNode_01_melody_2.wav" },
-            { name: "はじけるシンセ", src: "audio/sanpo/Tpb_BGMNode_01_melody_3.wav" }
+            { name: "バイオリン", src: "Audio/sanpo/Tpb_BGMNode_01_melody_1.ogg" },
+            { name: "リコーダー", src: "Audio/sanpo/Tpb_BGMNode_01_melody_2.ogg" },
+            { name: "はじけるシンセ", src: "Audio/sanpo/Tpb_BGMNode_01_melody_3.ogg" }
         ],
-        main: [
-            { name: "ピアノ", src: "audio/sanpo/Tpb_BGMNode_01_harmony1_1.wav" },
-            { name: "アコースティックギター", src: "audio/sanpo/Tpb_BGMNode_01_harmony1_2.wav" },
-            { name: "ベルシンセ", src: "audio/sanpo/Tpb_BGMNode_01_harmony1_3.wav" }
+        harmony1: [
+            { name: "ピアノ", src: "Audio/sanpo/Tpb_BGMNode_01_harmony1_1.ogg" },
+            { name: "アコースティックギター", src: "Audio/sanpo/Tpb_BGMNode_01_harmony1_2.ogg" },
+            { name: "ベルシンセ", src: "Audio/sanpo/Tpb_BGMNode_01_harmony1_3.ogg" }
         ],
-        sub: [
-            { name: "グロッケン", src: "audio/sanpo/Tpb_BGMNode_01_harmony2_1.wav" },
-            { name: "エコーシンセ", src: "audio/sanpo/Tpb_BGMNode_01_harmony2_2.wav" },
-            { name: "レトロシンセ", src: "audio/sanpo/Tpb_BGMNode_01_harmony2_3.wav" }
+        harmony2: [
+            { name: "グロッケン", src: "Audio/sanpo/Tpb_BGMNode_01_harmony2_1.ogg" },
+            { name: "エコーシンセ", src: "Audio/sanpo/Tpb_BGMNode_01_harmony2_2.ogg" },
+            { name: "レトロシンセ", src: "Audio/sanpo/Tpb_BGMNode_01_harmony2_3.ogg" }
         ],
         rhythm: [
-            { name: "ポップ", src: "audio/sanpo/Tpb_BGMNode_01_rhythm1.wav" },
-            { name: "マーチ", src: "audio/sanpo/Tpb_BGMNode_01_rhythm2.wav" },
-            { name: "ジャズ", src: "audio/sanpo/Tpb_BGMNode_01_rhythm3.wav" }
+            { name: "ポップ", src: "Audio/sanpo/Tpb_BGMNode_01_rhythm1.ogg" },
+            { name: "マーチ", src: "Audio/sanpo/Tpb_BGMNode_01_rhythm2.ogg" },
+            { name: "ジャズ", src: "Audio/sanpo/Tpb_BGMNode_01_rhythm3.ogg" }
         ]
     },
     "skip": {
         loopStartSample: 321523,
         loopEndSample: 2873419,
         melody: [
-            { name: "クラリネット", src: "audio/skip_melody_1.mp3" },
-            { name: "トロンボーン", src: "audio/skip_melody_2.mp3" },
-            { name: "木琴", src: "audio/skip_melody_3.mp3" }
+            { name: "クラリネット", src: "Audio/skip/Tpb_BGMNode_02_melody_1.ogg" },
+            { name: "トロンボーン", src: "Audio/skip/Tpb_BGMNode_02_melody_2.ogg" },
+            { name: "木琴", src: "Audio/skip/Tpb_BGMNode_02_melody_3.ogg" }
         ],
-        main: [
-            { name: "バンジョー", src: "audio/skip_main_1.mp3" },
-            { name: "ギターとオルガン", src: "audio/skip_main_2.mp3" },
-            { name: "シンセオルガン", src: "audio/skip_main_3.mp3" }
+        harmony1: [
+            { name: "バンジョー", src: "Audio/skip/Tpb_BGMNode_02_harmony1_1.ogg" },
+            { name: "ギターとオルガン", src: "Audio/skip/Tpb_BGMNode_02_harmony1_2.ogg" },
+            { name: "シンセオルガン", src: "Audio/skip/Tpb_BGMNode_02_harmony1_3.ogg" }
         ],
-        sub: [
-            { name: "ピョンシンセ", src: "audio/skip_sub_1.mp3" },
-            { name: "シンセチャイム", src: "audio/skip_sub_2.mp3" },
-            { name: "おもちゃラッパ", src: "audio/skip_sub_3.mp3" }
+        harmony2: [
+            { name: "ピョンシンセ", src: "Audio/skip/Tpb_BGMNode_02_harmony2_1.ogg" },
+            { name: "シンセチャイム", src: "Audio/skip/Tpb_BGMNode_02_harmony2_2.ogg" },
+            { name: "おもちゃラッパ", src: "Audio/skip/Tpb_BGMNode_02_harmony2_3.ogg" }
         ],
         rhythm: [
-            { name: "ディクシー", src: "audio/skip_rhythm_1.mp3" },
-            { name: "レゲエ", src: "audio/skip_rhythm_2.mp3" },
-            { name: "6/8マーチ", src: "audio/skip_rhythm_3.mp3" }
+            { name: "ディクシー", src: "Audio/skip/Tpb_BGMNode_02_rhythm1.ogg" },
+            { name: "レゲエ", src: "Audio/skip/Tpb_BGMNode_02_rhythm2.ogg" },
+            { name: "6/8マーチ", src: "Audio/skip/Tpb_BGMNode_02_rhythm3.ogg" }
         ]
     },
-    "jimichi": generateDummyData("jimichi"),
+    "jimichi": {
+        loopStartSample: 321523,
+        loopEndSample: 2873419,
+        melody: [
+            { name: "クラリネット", src: "Audio/skip/Tpb_BGMNode_02_melody_1.ogg" },
+            { name: "トロンボーン", src: "Audio/skip/Tpb_BGMNode_02_melody_2.ogg" },
+            { name: "木琴", src: "Audio/skip/Tpb_BGMNode_02_melody_3.ogg" }
+        ],
+        harmony1: [
+            { name: "バンジョー", src: "Audio/skip/Tpb_BGMNode_02_harmony1_1.ogg" },
+            { name: "ギターとオルガン", src: "Audio/skip/Tpb_BGMNode_02_harmony1_2.ogg" },
+            { name: "シンセオルガン", src: "Audio/skip/Tpb_BGMNode_02_harmony1_3.ogg" }
+        ],
+        harmony2: [
+            { name: "ピョンシンセ", src: "Audio/skip/Tpb_BGMNode_02_harmony2_1.ogg" },
+            { name: "シンセチャイム", src: "Audio/skip/Tpb_BGMNode_02_harmony2_2.ogg" },
+            { name: "おもちゃラッパ", src: "Audio/skip/Tpb_BGMNode_02_harmony2_3.ogg" }
+        ],
+        rhythm: [
+            { name: "ディクシー", src: "Audio/skip/Tpb_BGMNode_02_rhythm1.ogg" },
+            { name: "レゲエ", src: "Audio/skip/Tpb_BGMNode_02_rhythm2.ogg" },
+            { name: "6/8マーチ", src: "Audio/skip/Tpb_BGMNode_02_rhythm3.ogg" }
+        ]
+    },
     "hidamari": generateDummyData("hidamari"),
     "yukan": generateDummyData("yukan"),
     "kinpaku": generateDummyData("kinpaku"),
@@ -229,50 +286,56 @@ function generateDummyData(songId) {
         loopStartSample: 0,
         loopEndSample: 100000,
         melody: [
-            { name: "メロディA", src: `audio/${songId}_melody_1.mp3` },
-            { name: "メロディB", src: `audio/${songId}_melody_2.mp3` },
-            { name: "メロディC", src: `audio/${songId}_melody_3.mp3` }
+            { name: "メロディA", src: `Audio/${songId}_melody_1.mp3` },
+            { name: "メロディB", src: `Audio/${songId}_melody_2.mp3` },
+            { name: "メロディC", src: `Audio/${songId}_melody_3.mp3` }
         ],
-        main: [
-            { name: "メイン伴奏A", src: `audio/${songId}_main_1.mp3` },
-            { name: "メイン伴奏B", src: `audio/${songId}_main_2.mp3` },
-            { name: "メイン伴奏C", src: `audio/${songId}_main_3.mp3` }
+        harmony1: [
+            { name: "メイン伴奏A", src: `Audio/${songId}_harmony1_1.mp3` },
+            { name: "メイン伴奏B", src: `Audio/${songId}_harmony1_2.mp3` },
+            { name: "メイン伴奏C", src: `Audio/${songId}_harmony1_3.mp3` }
         ],
-        sub: [
-            { name: "サブ伴奏A", src: `audio/${songId}_sub_1.mp3` },
-            { name: "サブ伴奏B", src: `audio/${songId}_sub_2.mp3` },
-            { name: "サブ伴奏C", src: `audio/${songId}_sub_3.mp3` }
+        harmony2: [
+            { name: "サブ伴奏A", src: `Audio/${songId}_harmony2_1.mp3` },
+            { name: "サブ伴奏B", src: `Audio/${songId}_harmony2_2.mp3` },
+            { name: "サブ伴奏C", src: `Audio/${songId}_harmony2_3.mp3` }
         ],
         rhythm: [
-            { name: "リズムA", src: `audio/${songId}_rhythm_1.mp3` },
-            { name: "リズムB", src: `audio/${songId}_rhythm_2.mp3` },
-            { name: "リズムC", src: `audio/${songId}_rhythm_3.mp3` }
+            { name: "リズムA", src: `Audio/${songId}_rhythm_1.mp3` },
+            { name: "リズムB", src: `Audio/${songId}_rhythm_2.mp3` },
+            { name: "リズムC", src: `Audio/${songId}_rhythm_3.mp3` }
         ]
     };
 }
 
 /**
- * ＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝
- * 内部のプログラム処理（Web Audio APIによるシームレス再生）
- * ＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝
+ * 内部プログラム
  */
 let audioCtx = null;
+let masterGain = null; // 全体の音量を制御するマスターノード
 let isPlaying = false;
-let globalStartTime = 0; // 全パート共通の基準時間
-let pauseOffset = 0;     // 一時停止した位置
+let globalStartTime = 0; 
+let pauseOffset = 0;     
+let currentPlaybackRate = 1.0; // 現在の再生速度
 
-const parts = ["melody", "main", "sub", "rhythm"];
+const parts = ["melody", "harmony1", "harmony2", "rhythm"];
 
-// 再生中のノードを管理するオブジェクト
 const activeNodes = {
     melody: { source: null, currentSrc: null },
-    main: { source: null, currentSrc: null },
-    sub: { source: null, currentSrc: null },
+    harmony1: { source: null, currentSrc: null },
+    harmony2: { source: null, currentSrc: null },
     rhythm: { source: null, currentSrc: null }
 };
 
-// 取得した音声データをキャッシュ（毎回ダウンロードしないため）
 const audioCache = {};
+
+// AudioContextとMasterGainの初期化
+function initAudio() {
+    audioCtx = new AudioContext();
+    masterGain = audioCtx.createGain();
+    masterGain.connect(audioCtx.destination);
+    masterGain.gain.value = parseFloat(document.getElementById("volume-slider").value);
+}
 
 async function fetchAndDecodeAudio(url) {
     if (!audioCtx) return null;
@@ -290,28 +353,24 @@ async function fetchAndDecodeAudio(url) {
     }
 }
 
-// 共通の時計（マスタークロック）を使って、途中から再生する際のズレを計算
-function calculateOffset(loopStartSec, loopEndSec, duration) {
+// 再生速度も考慮した現在の曲の経過時間を計算
+function getCurrentSongTime() {
     if (!isPlaying) return pauseOffset;
-    
-    let elapsedTime = audioCtx.currentTime - globalStartTime;
+    return pauseOffset + (audioCtx.currentTime - globalStartTime) * currentPlaybackRate;
+}
+
+function calculateOffset(loopStartSec, loopEndSec, duration) {
+    let elapsedTime = getCurrentSongTime();
     let loopDuration = loopEndSec - loopStartSec;
 
-    // もし現在の時間がループの終端を超えていたら、ループ範囲内でどこにいるか計算する
     if (elapsedTime > loopEndSec && loopDuration > 0) {
         return loopStartSec + ((elapsedTime - loopStartSec) % loopDuration);
     }
     return elapsedTime;
 }
 
-// 特定のパートを再生する
-async function playPart(part, src, loopStartSample, loopEndSample) {
-    activeNodes[part].currentSrc = src;
-    
-    const buffer = await fetchAndDecodeAudio(src);
-    if (!buffer || activeNodes[part].currentSrc !== src) return; // 読み込み中に別のラジオボタンが押されたらキャンセル
-
-    // 既存の音が鳴っていたら止める
+// 読み込み済みのバッファを再生する（ズレ防止のため即座に起動）
+function startNodeSync(part, buffer, src, loopStartSample, loopEndSample) {
     if (activeNodes[part].source) {
         activeNodes[part].source.stop();
         activeNodes[part].source.disconnect();
@@ -320,45 +379,58 @@ async function playPart(part, src, loopStartSample, loopEndSample) {
     const source = audioCtx.createBufferSource();
     source.buffer = buffer;
     source.loop = true;
+    source.playbackRate.value = currentPlaybackRate; // 速度を適用
 
-    // サンプル数から秒数に変換してループポイントを設定（バッファのサンプリングレートを利用）
     if (loopStartSample !== undefined && loopEndSample !== undefined) {
         source.loopStart = loopStartSample / buffer.sampleRate;
         source.loopEnd = loopEndSample / buffer.sampleRate;
     }
 
-    source.connect(audioCtx.destination);
+    source.connect(masterGain); // Destinationではなくマスター音量に接続
     activeNodes[part].source = source;
 
-    // 現在のマスター時計から、再生を開始すべき位置（秒）を計算してスタート
     const offset = calculateOffset(source.loopStart, source.loopEnd || buffer.duration, buffer.duration);
     source.start(0, offset);
 }
 
 // 全体再生
 async function playAll() {
-    if (!audioCtx) {
-        audioCtx = new AudioContext();
-    }
-    if (audioCtx.state === 'suspended') {
-        await audioCtx.resume();
-    }
+    if (!audioCtx) initAudio();
+    if (audioCtx.state === 'suspended') await audioCtx.resume();
     if (isPlaying) return;
 
-    globalStartTime = audioCtx.currentTime - pauseOffset;
-    isPlaying = true;
-
-    document.getElementById("btn-play").disabled = true;
-    document.getElementById("btn-pause").disabled = false;
+    const toggleBtn = document.getElementById("btn-toggle");
+    toggleBtn.disabled = true; // 読み込み中の多重クリック防止
 
     const songId = document.getElementById("songSelect").value;
     const songData = MUSIC_DATA[songId];
+    
+    // 【修正箇所】開始時のズレ・無音を防ぐため、必要な音声を先にすべてダウンロード・デコードする
+    const loadPromises = [];
+    for (const part of parts) {
+        const radio = document.querySelector(`input[name="${part}"]:checked`);
+        if (radio.value !== "mute") {
+            const src = songData[part][parseInt(radio.value)].src;
+            loadPromises.push(fetchAndDecodeAudio(src));
+        }
+    }
+    await Promise.all(loadPromises); // 全ての読み込み完了を待つ
+
+    // 基準時間を設定し、一斉に再生開始
+    globalStartTime = audioCtx.currentTime;
+    isPlaying = true;
+    updateToggleButton();
+    toggleBtn.disabled = false;
 
     for (const part of parts) {
         const radio = document.querySelector(`input[name="${part}"]:checked`);
         if (radio.value !== "mute") {
             const src = songData[part][parseInt(radio.value)].src;
-            playPart(part, src, songData.loopStartSample, songData.loopEndSample);
+            const buffer = audioCache[src];
+            if (buffer) {
+                activeNodes[part].currentSrc = src;
+                startNodeSync(part, buffer, src, songData.loopStartSample, songData.loopEndSample);
+            }
         }
     }
 }
@@ -367,11 +439,9 @@ async function playAll() {
 function pauseAll() {
     if (!isPlaying) return;
     
-    pauseOffset = audioCtx.currentTime - globalStartTime;
+    pauseOffset = getCurrentSongTime(); // 速度を考慮した現在位置を保存
     isPlaying = false;
-
-    document.getElementById("btn-play").disabled = false;
-    document.getElementById("btn-pause").disabled = true;
+    updateToggleButton();
 
     for (const part of parts) {
         if (activeNodes[part].source) {
@@ -380,6 +450,21 @@ function pauseAll() {
             activeNodes[part].source = null;
         }
     }
+}
+
+// 再生・一時停止のトグル
+function togglePlay() {
+    if (isPlaying) {
+        pauseAll();
+    } else {
+        playAll();
+    }
+}
+
+// トグルボタンのテキスト更新
+function updateToggleButton() {
+    const btn = document.getElementById("btn-toggle");
+    btn.textContent = isPlaying ? "一時停止" : "再生";
 }
 
 // 最初から再生
@@ -397,7 +482,6 @@ function updateUI() {
     const songId = document.getElementById("songSelect").value;
     const songData = MUSIC_DATA[songId];
 
-    // 曲が変わったときは停止して時間をリセット
     pauseAll();
     pauseOffset = 0;
 
@@ -405,17 +489,15 @@ function updateUI() {
         for (let i = 0; i < 3; i++) {
             document.getElementById(`label-${part}-${i}`).textContent = songData[part][i].name;
         }
-        // 初期値を「楽器1（value="0"）」にする
         document.querySelector(`input[name="${part}"][value="0"]`).checked = true;
     });
 }
 
 // ラジオボタンが切り替わったときの処理
-function handleRadioChange(event) {
+async function handleRadioChange(event) {
     const part = event.target.name; 
     const value = event.target.value;
     
-    // 無音が選ばれたらそのパートだけ止める
     if (value === "mute") {
         activeNodes[part].currentSrc = null;
         if (activeNodes[part].source) {
@@ -430,18 +512,49 @@ function handleRadioChange(event) {
     const songData = MUSIC_DATA[songId];
     const src = songData[part][parseInt(value)].src;
 
-    // 全体が再生中であれば、切り替えたパートを現在の時間に同期させて即座に鳴らす
     if (isPlaying) {
-        playPart(part, src, songData.loopStartSample, songData.loopEndSample);
+        activeNodes[part].currentSrc = src;
+        const buffer = await fetchAndDecodeAudio(src);
+        // 読み込み中に状態が変わっていたらキャンセル
+        if (!buffer || activeNodes[part].currentSrc !== src || !isPlaying) return; 
+        startNodeSync(part, buffer, src, songData.loopStartSample, songData.loopEndSample);
     }
 }
 
-// イベントリスナーの設定
-document.getElementById("btn-play").addEventListener("click", playAll);
-document.getElementById("btn-pause").addEventListener("click", pauseAll);
+// ＝＝＝ イベントリスナー ＝＝＝
+document.getElementById("btn-toggle").addEventListener("click", togglePlay);
 document.getElementById("btn-reset").addEventListener("click", resetAll);
-
 document.getElementById("songSelect").addEventListener("change", updateUI);
+
+// 音量スライダー
+document.getElementById("volume-slider").addEventListener("input", (e) => {
+    const val = parseFloat(e.target.value);
+    document.getElementById("volume-value").textContent = val.toFixed(2);
+    if (masterGain) {
+        masterGain.gain.value = val;
+    }
+});
+
+// 速度スライダー
+document.getElementById("speed-slider").addEventListener("input", (e) => {
+    const newRate = parseFloat(e.target.value);
+    document.getElementById("speed-value").textContent = newRate.toFixed(2);
+    
+    // 再生中であれば、現在の再生位置を記録してから基準時間をリセット（位置ズレ防止）
+    if (isPlaying) {
+        pauseOffset = getCurrentSongTime();
+        globalStartTime = audioCtx.currentTime;
+    }
+    
+    currentPlaybackRate = newRate;
+
+    // 現在再生中の全てのノードに速度を即時反映
+    for (const part of parts) {
+        if (activeNodes[part].source) {
+            activeNodes[part].source.playbackRate.value = currentPlaybackRate;
+        }
+    }
+});
 
 const radios = document.querySelectorAll('input[type="radio"]');
 radios.forEach(radio => {
